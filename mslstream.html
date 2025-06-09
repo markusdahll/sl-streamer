@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SL WebRTC (Muted Only)</title>
+  <style>
+    html, body { margin:0; padding:0; height:100%; overflow:hidden; background:#000 }
+    #player { width:100%; height:100%; }
+  </style>
+  <!-- Include OvenPlayer -->
+  <script src="https://cdn.jsdelivr.net/npm/ovenplayer@0.13.0/dist/ovenplayer.min.js"></script>
+</head>
+<body>
+  <div id="player"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      OvenPlayer.create('player', {
+        sources: [{
+          type: 'webrtc',
+          file: webrtc://157.180.45.28:3333/app/stream
+        }],
+        autoPlay: true,
+        muted: true,
+        loop: true,
+        controls: false  // hide any player controls
+      });
+    });
+  </script>
+</body>
+</html>
