@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>SL WebRTC Stream</title>
+  <meta charset="UTF-8">
+  <title>SL WebRTC Stream (Click-to-Unmute)</title>
   <style>
     html, body { margin:0; padding:0; height:100%; overflow:hidden; background:#000 }
     #player { width:100%; height:100%; }
@@ -11,15 +11,11 @@
       width:100%; height:100%;
       background:rgba(0,0,0,0.6);
       display:flex; align-items:center; justify-content:center;
-      color:white; font-family:sans-serif;
-      font-size:1.2em; cursor:pointer;
-      user-select:none;
-      /* ensure it sits above the video */
-      z-index:10;
+      color:#fff; font-family:sans-serif; font-size:1.2em;
+      cursor:pointer; user-select:none; z-index:10;
     }
     #overlay.hidden { display:none; }
   </style>
-  <!-- OvenPlayer script; adapt version or host locally if you must -->
   <script src="https://cdn.jsdelivr.net/npm/ovenplayer@0.13.0/dist/ovenplayer.min.js"></script>
 </head>
 <body>
@@ -27,51 +23,41 @@
   <div id="overlay">▶ Click anywhere to enable sound</div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // 1️⃣ Create the player, but start it muted
+    document.addEventListener('DOMContentLoaded', function(){
+      // 1️⃣ Initialize OvenPlayer muted
       var player = OvenPlayer.create('player', {
-        sources: [{
-          type: 'webrtc',
-          file: webrtc://157.180.45.28:3333/app/stream
-        }],
+        sources: [{ type:'webrtc', file:'webrtc://157.180.45.28:3333/app/stream' }],
         autoPlay: true,
-        muted: true,
-        loop: true
+        muted:   true,
+        loop:    true,
+        webrtcConfig: {
+          iceServers: [{ urls:['stun:stun.l.google.com:19302'] }]
+        }
       });
 
-      // 2️⃣ Grab references
-      var overlay = document.getElementById('overlay');
-      var videoEl;
+      var overlay = document.getElementById('overlay'), videoEl;
 
-      // Once the underlying <video> is ready, stash it
-      player.on('ready', function() {
+      // 2️⃣ Grab the <video> when ready
+      player.on('ready', function(){
         videoEl = player.getContainer().querySelector('video');
+        // If previously unmuted, skip overlay
+        if (localStorage.getItem('webrtcUnmuted')==='1') {
+          videoEl.muted = false;
+          videoEl.volume = 1.0;
+          overlay.classList.add('hidden');
+        }
       });
 
-      // 3️⃣ On first click, unmute and hide overlay
-      overlay.addEventListener('click', function() {
+      // 3️⃣ On first click: unmute + hide overlay + persist
+      overlay.addEventListener('click', function(){
         if (videoEl) {
           videoEl.muted = false;
           videoEl.volume = 1.0;
-          // Optionally re-play to be sure
           videoEl.play().catch(()=>{});
         }
         overlay.classList.add('hidden');
-
-        // 4️⃣ (Optional) Remember user choice so overlay never shows again
-        try { localStorage.setItem('webrtcUnmuted', '1'); } catch(e){}
+        try { localStorage.setItem('webrtcUnmuted','1'); } catch(e){}
       });
-
-      // 5️⃣ (Optional) Check if they’d unmuted before
-      try {
-        if (localStorage.getItem('webrtcUnmuted') === '1') {
-          overlay.classList.add('hidden');
-          player.on('ready', function() {
-            videoEl.muted = false;
-            videoEl.volume = 1.0;
-          });
-        }
-      } catch(e){}
     });
   </script>
 </body>
