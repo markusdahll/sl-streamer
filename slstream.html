@@ -1,21 +1,27 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <script src="https://cdn.jsdelivr.net/npm/ovenplayer/dist/ovenplayer.js"></script>
-        <style>
-            html,
-            body {
-                margin: 0;
-                background: #000;
-            }
-        </style>
-    </head>
-    <body>
-        <div id="p"></div>
-        <script>
-            const pl = OvenPlayer.create("p", { autoStart: true, mute: true, controls: false, sources: [{ type: "webrtc", file: "ws://157.180.45.28:3333/app/stream" }] });
-            pl.on("ready", () => pl.play());
-        </script>
-    </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>OvenMediaEngine WebRTC Test Player</title>
+  <!-- OvenPlayer from jsDelivr CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/ovenplayer/dist/ovenplayer.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; background: #000; }
+    #player { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <div id="player"></div>
+  <script>
+    OvenPlayer.create('player', {
+      autoStart: true,
+      controls: true,
+      mute: false,
+      sources: [{
+        type: "webrtc",
+        file: "ws://157.180.45.28:3333/app/stream"  // ← update host/app/stream if needed
+      }]
+    });
+  </script>
+</body>
 </html>
